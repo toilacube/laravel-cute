@@ -4,6 +4,7 @@ namespace App\Services\Cart;
 
 use App\DTOs\CartDTO\CartProductItemDTO;
 use App\DTOs\CartDTO\UserCartItemDTO;
+use App\Models\ProductItemImage;
 use App\Models\ShoppingCart;
 use App\Models\ShoppingCartItem;
 use App\Models\User;
@@ -18,27 +19,30 @@ class CartService
 
         $cartId = ShoppingCart::where('user_id', $userId)->get('id');
         $cartItems = ShoppingCartItem::where("cart_id", $cartId[0]->id)->with('product_item.product.product_items')->get();
-        $array = [];
+
+        $array = array();
         foreach ($cartItems as $cartItem) {
-            $item = array([
+            $img = ProductItemImage::where("product_item_id", $cartItem["product_item_id"])->first('url');
+
+            $item = array(
                 "productItemId" => $cartItem["product_item_id"],
                 "productId" => $cartItem["product_item"]["product"]["id"],
                 "name" => $cartItem["product_item"]["product"]["name"],
                 "price" => $cartItem["product_item"]["product"]["price_int"],
                 "color" => $cartItem["product_item"]["color"],
                 "size" => $cartItem["product_item"]["size"],
-                //"img" => $$cartItem["product_item"]["product"]["product_items"],
-                 "qty" => $cartItem["qty"],
-                 'allItemsOfProduct' => []
-            ]);
-            // foreach ($cartItem["product_item"]["product"]["product_items"] as $productItems) {
-            //     $productItem =  array([
-            //         "productItemId" => $productItems["id"],
-            //         "size" => $productItems["size"],
-            //         "color" => $productItems["color"]
-            //     ]);
-            //     array_merge($item['allItemsOfProduct'], $productItem);
-            // }
+                "img" => $img["url"],
+                "qty" => $cartItem["qty"],
+                'allItemsOfProduct' => array()
+            );
+            foreach ($cartItem["product_item"]["product"]["product_items"] as $productItems) {
+                $productItem =  array(
+                    "productItemId" => $productItems["id"],
+                    "size" => $productItems["size"],
+                    "color" => $productItems["color"]
+                );
+                array_push($item['allItemsOfProduct'], ($productItem));
+            }
 
             array_push($array,  $item);
         }
