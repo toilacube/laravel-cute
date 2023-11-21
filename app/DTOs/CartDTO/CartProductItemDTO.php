@@ -2,25 +2,34 @@
 
 namespace App\DTOs\CartDTO;
 
-use WendellAdriel\ValidatedDTO\SimpleDTO;
+class CartProductItemDTO {
+    public $productItemId;
+    public $productId;
+    public $name;
+    public $price;
+    public $color;
+    public $size;
+    public $img;
+    public $qty;
+    public $allItemsOfProduct;
 
-class CartProductItemDTO extends SimpleDTO
-{
-    public int $productItemId;
-    public string $size;
-    public string $color;
-
-
-
-    protected function defaults(): array
-    {
-        return [];
+    public function __construct($productItemId, $productId, $name, $price, $color, $size, $img, $qty) {
+        $this->productItemId = $productItemId;
+        $this->productId = $productId;
+        $this->name = $name;
+        $this->price = $price;
+        $this->color = $color;
+        $this->size = $size;
+        $this->img = $img;
+        $this->qty = $qty;
+        $this->allItemsOfProduct = [];
     }
 
-    protected function casts(): array
-    {
-        return [
-       
+    public function addProductItem($productItemId, $size, $color) {
+        $this->allItemsOfProduct[] = [
+            "productItemId" => $productItemId,
+            "size" => $size,
+            "color" => $color
         ];
     }
 }
