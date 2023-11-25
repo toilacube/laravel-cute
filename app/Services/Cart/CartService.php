@@ -167,6 +167,6 @@ class CartService
             $cartItem->delete();
             return $this->true;
         }
-        return  $cartItem;
+        return  $this->false;
     }
 }
