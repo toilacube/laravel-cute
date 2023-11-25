@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
+use Illuminate\Contracts\Auth\CanResetPassword;
+use App\Notifications\ResetPasswordNotification;
+use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 /**
  * Class User
  * 
@@ -29,10 +31,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  *
  * @package App\Models
  */
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticatable implements JWTSubject, CanResetPassword
 {
 
-	use Notifiable;
+	use Notifiable, CanResetPasswordTrait;
+
+
 
 	// Rest omitted for brevity
 

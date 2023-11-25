@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
+use App\Services\Auth\AuthService;
+use App\Services\User\UserService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
+use App\DTOs\Requests\PasswordChangeDTO;
+use App\DTOs\Requests\RegisterDTO;
 
 class AuthController extends Controller
 {
@@ -13,9 +17,9 @@ class AuthController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(private AuthService $authService, private UserService $userService)
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        // $this->middleware('auth:api', ['except' => ['login']]);
     }
 
     /**
@@ -31,7 +35,44 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return $this->respondWithToken($token);
+        $responseArray = $this->respondWithToken($token);
+        /*
+            
+            In the initial setup for tymons-jwt, 
+            $this->respondWithToken($token) is a json response with the token, something like this:
+            {
+                "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3MDA2MDM0ODgsImV4cCI6MTcwMDYwNzA4OCwibmJmIjoxNzAwNjAzNDg4LCJqdGkiOiJYSDNTSndpUzZmbklEcEJWIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.nsN8hPL5Pfp9iM_rMYfKouz5TtCASfRwj6hiCu0amlQ",
+                "token_type": "bearer",
+                "expires_in": 3600
+            }
+
+            But i modified the respondWithToken method to return it as a array instead of a json response.
+        */
+
+        return $responseArray['access_token'];
+    }
+
+    public function test(Request $request)
+    {
+        $test = $request->input('test');
+        return response($test, 200);
+    }
+
+    public function register(Request $request)
+    {
+
+        $registerDTO = new RegisterDTO(
+            $request->input('email'),
+            $request->input('password')
+        );
+
+        $user = $this->userService->createUser($registerDTO);
+
+        if ($user) {
+            return response()->json(['message' => 'User registered successfully'], 201);
+        } else {
+            return response()->json(['error' => 'Failed to register user'], 500);
+        }
     }
 
     /**
@@ -56,6 +97,23 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out']);
     }
 
+    public function changepassword(Request $request)
+    {
+        /*
+            {
+            "oldPassword": "string",
+            "newPassword": "string1234"
+            }
+        */
+        $oldPassword = $request->input('oldPassword');
+        $newPassword = $request->input('newPassword');
+
+        // Create an instance of the DTO
+        $passwordChangeDTO = new PasswordChangeDTO($oldPassword, $newPassword);
+        $userId = Auth::id();
+        return $this->authService->changepassword($userId, $passwordChangeDTO);
+    }
+
     /**
      * Refresh a token.
      *
@@ -77,10 +135,16 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
-        return response()->json([
+        // return response()->json([
+        //     'access_token' => $token,
+        //     'token_type' => 'bearer',
+        //     'expires_in' => Auth::factory()->getTTL() * 60
+        // ]);
+
+        return [
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::factory()->getTTL() * 60
-        ]);
+        ];
     }
 }
