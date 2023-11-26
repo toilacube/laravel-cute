@@ -51,4 +51,5 @@ class Address extends Model
 		return $this->belongsToMany(User::class, 'user_address')
 					->withPivot('is_default');
 	}
+	
 }
