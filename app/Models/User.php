@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -14,6 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
+
 /**
  * Class User
  * 
@@ -21,6 +23,10 @@ use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
  * @property string|null $name
  * @property string|null $email
  * @property string|null $phone_number
+ * @property string|null $gender
+ * @property int|null $weight
+ * @property int|null $height
+ * @property string|null $birth
  * @property string|null $password
  * 
  * @property Collection|ShopOrder[] $shop_orders
@@ -33,7 +39,6 @@ use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
  */
 class User extends Authenticatable implements JWTSubject, CanResetPassword
 {
-
 	use Notifiable, CanResetPasswordTrait;
 
 
@@ -59,9 +64,13 @@ class User extends Authenticatable implements JWTSubject, CanResetPassword
 	{
 		return [];
 	}
-
 	protected $table = 'user';
 	public $timestamps = false;
+
+	protected $casts = [
+		'weight' => 'int',
+		'height' => 'int'
+	];
 
 	protected $hidden = [
 		'password'
@@ -71,6 +80,10 @@ class User extends Authenticatable implements JWTSubject, CanResetPassword
 		'name',
 		'email',
 		'phone_number',
+		'gender',
+		'weight',
+		'height',
+		'birth',
 		'password'
 	];
 
@@ -87,7 +100,7 @@ class User extends Authenticatable implements JWTSubject, CanResetPassword
 	public function addresses()
 	{
 		return $this->belongsToMany(Address::class, 'user_address')
-			->withPivot('is_default');
+			->withPivot('is_default', 'name', 'phone_number');
 	}
 
 	public function user_payment_methods()

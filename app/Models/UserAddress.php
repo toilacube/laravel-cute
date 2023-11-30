@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $user_id
  * @property int|null $address_id
  * @property int|null $is_default
+ * @property string|null $name
+ * @property string|null $phone_number
  * 
  * @property Address|null $address
  * @property User|null $user
@@ -35,7 +37,9 @@ class UserAddress extends Model
 	protected $fillable = [
 		'user_id',
 		'address_id',
-		'is_default'
+		'is_default',
+		'name',
+		'phone_number'
 	];
 
 	public function address()

@@ -18,9 +18,9 @@ class AddressDTO
     public function toArray()
     {
         return [
-            'address_id' => $this->addressId,
-            'street_line' => $this->streetLine,
-            'is_default' => $this->isDefault,
+            'addressId' => $this->addressId,
+            'streetLine' => $this->streetLine,
+            'isDefault' => $this->isDefault,
         ];
     }
 

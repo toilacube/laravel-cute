@@ -7,6 +7,7 @@ use App\Models\Address;
 use App\Models\UserAddress;
 use App\DTOs\Requests\RegisterDTO;
 use App\DTOs\Responses\AddressDTO;
+use App\DTOs\UserDTO\UserInfoDTO;
 
 /**
  * Class UserService.
@@ -15,6 +16,7 @@ class UserService
 {
     private $true = "true";
     private $false = "false";
+
     public function createUser(RegisterDTO $registerDTO)
     {
         return User::create([
@@ -25,7 +27,10 @@ class UserService
 
     public function findUser($userId)
     {
-        return User::find($userId);
+
+        $user = User::find($userId);
+
+        return $user;
     }
 
     public function findAddresses($userId)
@@ -43,21 +48,21 @@ class UserService
         return  response($addresses);
     }
 
-    public function addAddress($userId, $address)
+    public function addAddress($userId, $addressDTO)
     {
         $address = Address::create([
-            'address_line' => $address,
+            'address_line' => $addressDTO->getStreetLine(),
         ]);
-        if ($address) {
-            $user = User::find($userId);
-            $user->addresses()->attach($address->id);
-
-            UserAddress::where('user_id', $user->id)
-                ->where('address_id', $address->id)
-                ->update(['is_default' => 0]);
-            return $this->true;
-        }
-        return $this->false;
+        $userAddress = UserAddress::create([
+            'user_id' => $userId,
+            'address_id' => $address->id,
+            'name' => $addressDTO->getName(),
+            'phone_number' => $addressDTO->getPhoneNumber(),
+            'is_default' => $addressDTO->isDefault(),
+        ]);
+        $user = User::find($userId);
+        $user->addresses()->attach($address->id, ['is_default' => $addressDTO->isDefault()]);
+        return $this->true;
     }
 
     public function MakeAddressDefault($userId, $addressId)
@@ -68,5 +73,30 @@ class UserService
             ->where('address_id', '!=', $addressId)
             ->update(['is_default' => 0]);
         return $this->true;
+    }
+
+    public function updateAddress($userId, $addressDTO)
+    {
+        $user = User::find($userId);
+        Address::where('id', $addressDTO->getAddressId())
+            ->update(['address_line' => $addressDTO->getStreetLine()]);
+
+        $user->addresses()->updateExistingPivot($addressDTO->getAddressId(), [
+            'name' => $addressDTO->getName(),
+            'phone_number' => $addressDTO->getPhoneNumber(),
+        ]);
+        if($user)
+            return $this->true;
+        else
+            return $this->false;
+    }
+
+    public function deleteAddress($userId, $addressId)
+    {
+        $user = User::find($userId);
+        $user->addresses()->detach($addressId);
+
+        if($user) return $this->true;
+        else return $this->false;
     }
 }

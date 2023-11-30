@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $commune
  * 
  * @property Collection|ShippingFee[] $shipping_fees
- * @property Collection|ShopOrder[] $shop_orders
  * @property Collection|User[] $users
  *
  * @package App\Models
@@ -41,15 +40,9 @@ class Address extends Model
 		return $this->hasMany(ShippingFee::class, 'shipping_address');
 	}
 
-	public function shop_orders()
-	{
-		return $this->hasMany(ShopOrder::class, 'shipping_address');
-	}
-
 	public function users()
 	{
 		return $this->belongsToMany(User::class, 'user_address')
-					->withPivot('is_default');
+					->withPivot('is_default', 'name', 'phone_number');
 	}
-	
 }

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int|null $parent_category_id
  * @property string|null $category_name
+ * @property string|null $category_slug
  * 
  * @property Collection|Product[] $products
  *
@@ -31,7 +32,8 @@ class ProductCategory extends Model
 
 	protected $fillable = [
 		'parent_category_id',
-		'category_name'
+		'category_name',
+		'category_slug'
 	];
 
 	public function products()
