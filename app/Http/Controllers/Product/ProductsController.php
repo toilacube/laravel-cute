@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Product;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\Products\ProductsService;
 use Illuminate\Support\Facades\DB;
+use App\DTOs\Requests\AddProductDTO;
+use App\Http\Controllers\Controller;
+use App\DTOs\Requests\UpdateProductDTO;
+use App\Services\Products\ProductsService;
 use Illuminate\Database\Eloquent\Casts\Json;
 
 class ProductsController extends Controller
@@ -16,61 +18,55 @@ class ProductsController extends Controller
     /**
      * Display MAC HANG NGAY(casual) products.
      */
-    public function casual(Request $request)
+    public function products(Request $request)
     {
-        return  $this->productsService->getCasualProducts($request->query('category'));
+        return  $this->productsService->products($request->category_slug);
     }
 
-    public function test()
-    {
-        return $this->productsService->getTest();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        //
+        return $this->productsService->show($id);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Search products.
      */
-    public function edit(string $id)
+    public function search(Request $request)
     {
-        //
+        return $this->productsService->search($request->searchTerm);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        $updateProductDTO = new UpdateProductDTO(
+            $request->id,
+            $request->categoryId,
+            $request->name,
+            $request->description,
+            $request->priceInt,
+            $request->priceStr,
+        );
+        return $this->productsService->update($updateProductDTO);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function add(Request $request)
     {
-        //
+        return $request->all();
+        $items = $request->file('list');
+        $images = [];
+        foreach ($items as $item) {
+           
+            $images[] = $item->getRealPath();
+        }
+        return $images;
+
+
+        return 'False';
+
+        return $this->productsService->add();
     }
 }

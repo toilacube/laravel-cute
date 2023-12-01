@@ -5,98 +5,179 @@ namespace App\Services\Products;
 use PDO;
 use App\Models\Product;
 use App\Models\ProductItem;
-use App\Models\ProductItemImage;
-
+use App\Models\ProductCategory;
 use function PHPSTORM_META\map;
+use App\Models\ProductItemImage;
 use Illuminate\Support\Facades\DB;
+use App\DTOs\Responses\ProductsDTO\ProductDTO;
+
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\DTOs\Responses\ProductsDTO\ItemImageDTO;
+use App\DTOs\Responses\ProductsDTO\ProductItemDTO;
+use App\DTOs\Responses\ProductsDTO\SearchProductDTO;
 
 class ProductsService
 {
-
-    public function getCasualProducts($category)
+    private $true = "Successfull";
+    private $false = "Failed";
+    public function products($category_slug)
     {
-        if (!is_null($category)) {
-            if ($category == 'ao-cac-loai') $category = 2;
-            else if ($category == 'quan-cac-loai') $category = 3;
-            else if ($category == 'phu-kien-cac-loai') $category = 4;
-            else $category = -1;
+
+        $categoryId = ProductCategory::where('category_slug', $category_slug)->first()->id;
+
+        $products = Product::where('category_id', $categoryId)->get();
+
+        $productsDTO = [];
+
+        foreach ($products as $product) {
+            $productDTO = new ProductDTO(
+                $product->id,
+                $product->category_id,
+                $product->name,
+                $product->description,
+                $product->price_int,
+                $product->price_str,
+                ProductCategory::where('id', $categoryId)->first()->category_name,
+                //$product->product_items
+            );
+
+            ProductItem::where('product_id', $product->id)->get()
+                ->map(function ($productItem) use ($productDTO) {
+
+                    $itemImages = [];
+
+                    $images = ProductItemImage::where('product_item_id', $productItem->id)->get();
+                    foreach ($images as $image) {
+                        $itemImage = new ItemImageDTO(
+                            $image->id,
+                            $image->product_item_id,
+                            $image->url,
+                        );
+                        $itemImages[] = $itemImage->toArray();
+                    }
+
+                    $productItemDTO = new ProductItemDTO(
+                        $productItem->id,
+                        $productItem->product_id,
+                        $productItem->size,
+                        $productItem->color,
+                        $productItem->color_image,
+                        $productItem->qty_in_stock,
+                        null,
+                        null,
+                        $itemImages
+                    );
+                    $productDTO->productItems[] =  $productItemDTO->toArray();
+                });
+
+            $productsDTO[] = $productDTO->toArray();
         }
-        $parent_category_id = DB::table('product_category')
-            ->where('category_name', 'Mặc hàng ngày')
-            ->value('id');
 
-        // return an array of category_id
-        $category_id = DB::table('product_category')
-            ->where('parent_category_id', $parent_category_id)
-            ->when($category != -1, function ($query) use ($category) {
-                return $query->where('id', $category);
-            })
-            ->get('id')
-            ->pluck('id');
-
-
-        $casual = DB::table('product')
-            ->whereIn('category_id', $category_id)
-            ->get();
-
-        $casual = $casual->map(function ($product) {
-
-            // get list of product color name
-            $item = DB::table('product_item')
-                ->where('product_id', $product->id)
-                ->distinct()
-                ->get('color');
-            $id =  $product->id;
-
-            $item = $item->map(function ($c) use ($id) {
-
-                //get the correspoding color image
-                $colorImage = DB::table('product_item')
-                    ->where('product_id', $id)
-                    ->where('color', $c->color)
-                    ->get(['color_image', 'id', 'qty_in_stock'])
-                    ->first();
-
-                // get the item image
-                $itemImage = DB::table('product_item_image')
-                    ->where('product_item_id', $colorImage->id)
-                    ->get('url');
-                $c->color_img = $colorImage->color_image;
-                $c->item_img = $itemImage;
-                $c->qtycube = $colorImage->qty_in_stock;
-                return $c;
-            });
-
-            $product->item = $item;
-            return $product;
-        });
 
         // The number of items per page
         $perPage = 10; // You can change this value to the number of items you want per page.
 
         // Create a LengthAwarePaginator instance
         $page = \Illuminate\Pagination\Paginator::resolveCurrentPage('page');
-        $pagedData = array_slice($casual->toArray(), ($page - 1) * $perPage, $perPage);
-        $casualPaginated = new LengthAwarePaginator($pagedData, count($casual), $perPage);
+
+        $pagedData = array_slice($productsDTO, ($page - 1) * $perPage, $perPage);
+
+        $casualPaginated = new LengthAwarePaginator(
+            $pagedData,
+            count($productsDTO),
+            $perPage,
+            null,
+            ['path' => 'localhost:8000/api/product/' . $category_slug]
+        );
 
         return response($casualPaginated);
-
-        //return response()->json($casual);
     }
 
-
-    public function getTest()
+    public function show($productId)
     {
-        $items = ProductItem::find(1);
-        $items->product_item_images()->get();
+        $product = Product::where('id', $productId)->first();
+        $productDTO = new ProductDTO(
+            $product->id,
+            $product->category_id,
+            $product->name,
+            $product->description,
+            $product->price_int,
+            $product->price_str,
+            ProductCategory::where('id', $product->category_id)->first()->category_name,
+            //$product->product_items
+        );
+        ProductItem::where('product_id', $product->id)->get()
+            ->map(function ($productItem) use ($productDTO) {
 
-        $itemsWithImages = ProductItem::with('product_item_images')->get();
-        $productsWithItemsAndImages = Product::with('product_items.product_item_images')->get();
+                $itemImages = [];
 
-        $items = ProductItemImage::find(1);
-        $itemsImg = $items->product_item()->get();
+                $images = ProductItemImage::where('product_item_id', $productItem->id)->get();
+                foreach ($images as $image) {
+                    $itemImage = new ItemImageDTO(
+                        $image->id,
+                        $image->product_item_id,
+                        $image->url,
+                    );
+                    $itemImages[] = $itemImage->toArray();
+                }
 
-        return response($itemsImg);
+                $productItemDTO = new ProductItemDTO(
+                    $productItem->id,
+                    $productItem->product_id,
+                    $productItem->size,
+                    $productItem->color,
+                    $productItem->color_image,
+                    $productItem->qty_in_stock,
+                    null,
+                    null,
+                    $itemImages
+                );
+                $productDTO->productItems[] =  $productItemDTO->toArray();
+            });
+
+        return response($productDTO->toArray());
+    }
+
+    public function search($searchTerm)
+    {
+        $products = Product::where('name', 'like', '%' . $searchTerm . '%')->get();
+
+        $productsDTO = [];
+
+        foreach ($products as $product) {
+
+            $img = $product->product_items->first()->product_item_images->first()->url ?? null;
+
+            $productDTO = new SearchProductDTO(
+                $product->id,
+                $product->category_id,
+                $product->name,
+                $product->description,
+                $product->price_int,
+                $product->price_str,
+                ProductCategory::where('id', $product->category_id)->first()->category_name,
+                $img
+            );
+
+            $productsDTO[] = $productDTO->toArray();
+        }
+        return response($productsDTO);
+    }
+
+    public function update($updateProductDTO)
+    {
+        $product = Product::where('id', $updateProductDTO->id)->first();
+        $product->name = $updateProductDTO->name;
+        $product->category_id = $updateProductDTO->categoryId;
+        $product->description = $updateProductDTO->description;
+        $product->price_int = $updateProductDTO->priceInt;
+        $product->price_str = $updateProductDTO->priceStr;
+        $product->save();
+
+        return response($this->true);
+    }
+
+    public function add(){
+        return $this->true;
     }
 }

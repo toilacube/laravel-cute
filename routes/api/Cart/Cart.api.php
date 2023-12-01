@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->prefix('cart')->group(function () {
 
-    Route::get('/', [CartController::class, 'index']);
+    Route::get('/', [CartController::class, 'cart']);
 
     Route::post('/add', [CartController::class, 'addToCart']);
 
