@@ -2,19 +2,23 @@
 
 namespace App\Services\Products;
 
+use App\DTOs\Requests\AddProduct\AddProductDTO;
+use App\DTOs\Requests\AddProduct\AddProductItemDTO;
 use PDO;
 use App\Models\Product;
 use App\Models\ProductItem;
+use Illuminate\Http\Request;
 use App\Models\ProductCategory;
 use function PHPSTORM_META\map;
 use App\Models\ProductItemImage;
+
 use Illuminate\Support\Facades\DB;
 use App\DTOs\Responses\ProductsDTO\ProductDTO;
-
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\DTOs\Responses\ProductsDTO\ItemImageDTO;
 use App\DTOs\Responses\ProductsDTO\ProductItemDTO;
 use App\DTOs\Responses\ProductsDTO\SearchProductDTO;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ProductsService
 {
@@ -177,7 +181,39 @@ class ProductsService
         return response($this->true);
     }
 
-    public function add(){
-        return $this->true;
+    public function add($productDTO, $productItemDTO)
+    {
+        //return $request;
+
+        $product = Product::create([
+            'category_id' => $productDTO->getCategoryId(),
+            'name' => $productDTO->getName(),
+            'description' => $productDTO->getDescription(),
+            'price_int' => $productDTO->getPriceInt(),
+            'price_str' => $productDTO->getPriceStr(),
+        ]);
+
+        $productId = $product->id;
+        foreach ($productItemDTO->getSize() as $size) {
+            $productItem = ProductItem::create([
+                'product_id' => $productId,
+                'size' => $size,
+                'color' => $productItemDTO->getColor(),
+                'color_image' => $productItemDTO->getUrl(),
+                'qty_in_stock' => $productItemDTO->getQty(),
+            ]);
+
+            $productItemId = $productItem->id;
+
+            foreach ($productItemDTO->getImages() as $image) {
+                $link =Cloudinary::upload($image)->getSecurePath();
+                ProductItemImage::create([
+                    'product_item_id' => $productItemId,
+                    'url' => $link,
+                ]);
+            }
+        }
+
+        return $this->show($productId);
     }
 }
