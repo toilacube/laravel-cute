@@ -1,0 +1,17 @@
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Cart\CartController;
+use App\Http\Controllers\Category\CategoryController;
+
+Route::middleware('guest')->prefix('category')->group(function () {
+
+    Route::get('/', [CategoryController::class, 'index']);
+
+    Route::post('add', [CategoryController::class, 'add']);
+
+    Route::put('update', [CategoryController::class, 'update']);
+
+    Route::delete('delete', [CategoryController::class, 'delete']);
+});
