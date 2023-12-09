@@ -16,13 +16,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int|null $user_id
  * @property Carbon|null $order_date
- * @property int|null $payment_method_id
+ * @property int|null $payment_method
  * @property string|null $shipping_address
  * @property int|null $shipping_method
  * @property int|null $order_total
  * @property int|null $order_status
  * 
- * @property UserPaymentMethod|null $user_payment_method
  * @property User|null $user
  * @property Collection|OrderLine[] $order_lines
  *
@@ -36,7 +35,7 @@ class ShopOrder extends Model
 	protected $casts = [
 		'user_id' => 'int',
 		'order_date' => 'datetime',
-		'payment_method_id' => 'int',
+		'payment_method' => 'int',
 		'shipping_method' => 'int',
 		'order_total' => 'int',
 		'order_status' => 'int'
@@ -45,27 +44,12 @@ class ShopOrder extends Model
 	protected $fillable = [
 		'user_id',
 		'order_date',
-		'payment_method_id',
+		'payment_method',
 		'shipping_address',
 		'shipping_method',
 		'order_total',
 		'order_status'
 	];
-
-	public function user_payment_method()
-	{
-		return $this->belongsTo(UserPaymentMethod::class, 'payment_method_id');
-	}
-
-	public function shipping_method()
-	{
-		return $this->belongsTo(ShippingMethod::class, 'shipping_method');
-	}
-
-	public function order_status()
-	{
-		return $this->belongsTo(OrderStatus::class, 'order_status');
-	}
 
 	public function user()
 	{

@@ -2,10 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Cart\CartController;
 use App\Http\Controllers\Category\CategoryController;
 
-Route::middleware('guest')->prefix('category')->group(function () {
+Route::middleware('auth')->prefix('category')->group(function () {
 
     Route::get('/', [CategoryController::class, 'index']);
 
