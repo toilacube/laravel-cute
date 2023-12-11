@@ -4,7 +4,7 @@ use App\Http\Controllers\Cart\CartController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')->prefix('cart')->group(function () {
+Route::middleware('role:user')->prefix('cart')->group(function () {
 
     Route::get('/', [CartController::class, 'cart']);
 

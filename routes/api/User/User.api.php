@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\UserController;
 
 Route::group([
-    'middleware' => 'auth',
+    'middleware' => 'role:user',
     'prefix' => 'user'
 ], function ($router) {
 
@@ -13,7 +13,7 @@ Route::group([
     Route::put('updateInfo', [UserController::class, 'updateInfo']);
     Route::get('getAddresses', [UserController::class, 'getAddresses']);
     Route::post('addAddress', [UserController::class, 'addAddress']);
-    Route::post('MakeAddressDefault', [UserController::class, 'MakeAddressDefault']);
-    Route::put('updateAddress', [UserController::class, 'updateAddress']);
-    Route::delete('deleteAddress/{addressId}', [UserController::class, 'deleteAddress']);
+    Route::post('MakeAAddress', [UserController::class, 'updateAddress']);
+    Route::delete('delddressDefault', [UserController::class, 'MakeAddressDefault']);
+    Route::put('updateeteAddress/{addressId}', [UserController::class, 'deleteAddress']);
   });
