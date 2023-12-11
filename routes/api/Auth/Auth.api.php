@@ -18,12 +18,11 @@ Route::group([
     Route::post('login', [AuthController::class, 'login']);
     Route::get('test', [AuthController::class, 'test']);
 
-    // TODO: Forgot Password
+
     Route::post('forgotpassword', [PasswordResetController::class, 'forgotPassword']);
-    // TODO : Reset Password
     Route::post('resetpassword', [PasswordResetController::class, 'resetpassword']);
 
-    // Google Sign In
+
     Route::post('/google/get-google-sign-in-url', [GoogleController::class, 'getGoogleSignInUrl']);
     Route::get('/google/callback', [GoogleController::class, 'loginCallback']);
 });
