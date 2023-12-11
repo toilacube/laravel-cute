@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\DTOs\Requests\RegisterDTO;
 use App\Services\Auth\AuthService;
 use App\Services\User\UserService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\DTOs\Requests\PasswordChangeDTO;
-use App\DTOs\Requests\RegisterDTO;
 
 class AuthController extends Controller
 {
@@ -60,6 +61,10 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        $user = User::where('email', $request->input('email'))->first();
+        if ($user) {
+            return response()->json(['message' => 'User already existed'], 201);
+        }
 
         $registerDTO = new RegisterDTO(
             $request->input('email'),

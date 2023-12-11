@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\api\GoogleController;
 use App\Http\Controllers\Auth\PasswordResetController;
 
 
@@ -16,8 +17,14 @@ Route::group([
     Route::post('login', [AuthController::class, 'login']);
     Route::get('test', [AuthController::class, 'test']);
     Route::post('forgotpassword', [PasswordResetController::class, 'forgotPassword'])->name('password.request');
-});
 
+    // TODO
+
+    // Google Sign In
+    Route::post('/google/get-google-sign-in-url', [GoogleController::class, 'getGoogleSignInUrl'])
+    ;
+    Route::get('/google/callback', [GoogleController::class, 'loginCallback']);
+});
 
 
 Route::group([

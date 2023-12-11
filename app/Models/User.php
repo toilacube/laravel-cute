@@ -20,6 +20,7 @@ use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
  * Class User
  * 
  * @property int $id
+ * @property string|null $google_id
  * @property string|null $name
  * @property string|null $email
  * @property string|null $phone_number
