@@ -17,6 +17,8 @@ class PasswordResetController extends Controller
     public function forgotPassword(Request $request)
     {
 
+        $request->validate(['email' => 'required|email']);
+
         $status = Password::sendResetLink(
             $request->only('email')
         );
@@ -28,11 +30,11 @@ class PasswordResetController extends Controller
 
     public function resetPassword(Request $request)
     {
-        // $request->validate([
-        //     'email' => 'required|email',
-        //     'token' => 'required',
-        //     'password' => 'required|min:8',
-        // ]);
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required',
+            'password' => 'required',
+        ]);
 
         $status = Password::reset(
             $request->only('email', 'password', 'token'),
