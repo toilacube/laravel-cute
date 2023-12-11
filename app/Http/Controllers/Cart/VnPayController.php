@@ -16,11 +16,10 @@ class VnPayController
         $currentBillId = ShopOrder::max('id');
         $billId = $currentBillId + 2;
 
-
-        $vnp_TmnCode = "J7YVYY99"; //Mã website tại VNPAY 
-        $vnp_HashSecret = "NWXIYYSTGLDQYNJMVBFVPKAHPUYSOQOR"; //Chuỗi bí mật
+        $vnp_TmnCode = env('VNPAY_TMNCODE'); //Mã website tại VNPAY 
+        $vnp_HashSecret = env('VNPAY_HASHSECRET'); //Chuỗi bí mật
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "http://localhost:8000/return-vnpay";
+        $vnp_Returnurl = "http://localhost:8000/api/cart/checkout/return";
         $vnp_TxnRef = $billId; //Mã đơn hàng. Trong thực tế Merchant cần insert đơn hàng vào DB và gửi mã này sang VNPAY
         $vnp_OrderInfo = "Thanh toan don hang";
         $vnp_OrderType = 'billpayment';
@@ -64,13 +63,14 @@ class VnPayController
         $vnp_Url = $vnp_Url . "?" . $query;
         if (isset($vnp_HashSecret)) {
             // $vnpSecureHash = md5($vnp_HashSecret . $hashdata);
-            $vnpSecureHash = hash_hmac('sha512',$hashdata,  $vnp_HashSecret );
+            $vnpSecureHash = hash_hmac('sha512', $hashdata,  $vnp_HashSecret);
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
         return response()->json(["url" => $vnp_Url,  'query' => $query]);
     }
 
-    public function vnpay_return(Request $request){
+    public function vnpay_return(Request $request)
+    {
         $inputData = [];
         $returnData = [];
 
