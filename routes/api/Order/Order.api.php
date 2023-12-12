@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Cart\VnPayController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Order\OrderController;
@@ -9,8 +10,9 @@ use App\Http\Controllers\Order\OrderController;
 Route::middleware('role:user')->prefix('order')->group(function () {
 
     Route::get('get', [OrderController::class, 'get']);
-    // TODO: khong hieu api viet gi ca
     Route::post('create', [OrderController::class, 'create']);
+
+    Route::post('confirm', [VnPayController::class, 'confirmPayment']);
 });
 
 

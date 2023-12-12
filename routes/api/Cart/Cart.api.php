@@ -6,6 +6,7 @@ use App\Http\Controllers\Cart\CartController;
 use App\Http\Controllers\Cart\MomoController;
 use App\Http\Controllers\Cart\VnPayController;
 use App\Http\Controllers\Category\CheckOutController;
+use App\Services\Cart\MomoService;
 
 Route::middleware('role:user')->prefix('cart')->group(function () {
 
@@ -21,8 +22,7 @@ Route::middleware('role:user')->prefix('cart')->group(function () {
 
     Route::prefix('checkout')->group(function(){
         Route::post('create-payment', [VnPayController::class, 'vnpay_create_payment']);
-        Route::get('return', [VnPayController::class, 'vnpay_return']);
-        Route::post('momo', [MomoController::class, 'createPayment']);
+        
     });
    
 });

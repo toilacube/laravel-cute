@@ -7,6 +7,8 @@ class ProductItemDTO
     private int $id;
     private int $productId;
     private string $size;
+    private array $sizes;
+    private array $itemIds;
     private string $color;
     private string $colorImage;
     private int $qtyInStock;
@@ -18,6 +20,8 @@ class ProductItemDTO
         int $id,
         int $productId,
         string $size,
+        array $sizes,
+        array $itemIds,
         string $color,
         string $colorImage,
         int $qtyInStock,
@@ -28,6 +32,8 @@ class ProductItemDTO
         $this->id = $id;
         $this->productId = $productId;
         $this->size = $size;
+        $this->sizes = $sizes;
+        $this->itemIds = $itemIds;
         $this->color = $color;
         $this->colorImage = $colorImage;
         $this->qtyInStock = $qtyInStock;
@@ -42,6 +48,8 @@ class ProductItemDTO
             $data['id'],
             $data['productId'],
             $data['size'],
+            $data['sizes'],
+            $data['itemIds'],
             $data['color'],
             $data['colorImage'],
             $data['qtyInStock'],
@@ -57,6 +65,8 @@ class ProductItemDTO
             'id' => $this->id,
             'productId' => $this->productId,
             'size' => $this->size,
+            'sizes' => $this->sizes,
+            'itemIds' => $this->itemIds,
             'color' => $this->color,
             'colorImage' => $this->colorImage,
             'qtyInStock' => $this->qtyInStock,

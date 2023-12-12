@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Order;
 
 use Illuminate\Http\Request;
+use App\DTOs\Requests\AddOrderDTO;
 use App\Http\Controllers\Controller;
 use App\Services\Order\OrderService;
 use Illuminate\Support\Facades\Auth;
@@ -25,4 +26,15 @@ class OrderController extends Controller {
         $orderStatus = $request->status;
         return $this->orderService->updateStatus($orderId, $orderStatus);
     }
+
+    public function create(Request $request){
+        $userId = Auth::id();
+        $AddOrderDTO = new AddOrderDTO(
+            $request->shippingAddress,
+            $request->paymentMethod,
+            $request->shippingMethod
+        );
+        return $this->orderService->create($userId, $AddOrderDTO);
+    }
+
 }

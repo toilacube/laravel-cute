@@ -37,22 +37,13 @@ class AuthController extends Controller
         if (!$token = Auth::attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+        $userRole = Auth::user()->role;
 
-        $responseArray = $this->respondWithToken($token);
-        /*
-            
-            In the initial setup for tymons-jwt, 
-            $this->respondWithToken($token) is a json response with the token, something like this:
-            {
-                "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3MDA2MDM0ODgsImV4cCI6MTcwMDYwNzA4OCwibmJmIjoxNzAwNjAzNDg4LCJqdGkiOiJYSDNTSndpUzZmbklEcEJWIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.nsN8hPL5Pfp9iM_rMYfKouz5TtCASfRwj6hiCu0amlQ",
-                "token_type": "bearer",
-                "expires_in": 3600
-            }
+        $token = Auth::claims(['role' => $userRole])->attempt($credentials);
 
-            But i modified the respondWithToken method to return it as a array instead of a json response.
-        */
+   
 
-        return $responseArray['access_token'];
+        return response()->json(['token'=> $token, 'isAdmin' => $userRole]);
     }
 
     public function logout(Request $request)

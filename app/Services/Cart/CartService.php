@@ -78,7 +78,15 @@ class CartService
                 ->where('product_item_id', $productItemId)
                 ->first();
 
+
+            if ($quantity > $productItem->qty_in_stock) {
+                return "FAILED!!!!!!!"; // Or throw an exception or return an error response
+            }
+
             if ($existingCartItem) {
+                //Check if the item has enough quantity
+
+
                 // Update quantity if the item already exists in the cart
                 $existingCartItem->qty += $quantity;
                 $existingCartItem->save();
@@ -107,6 +115,12 @@ class CartService
     public function updateQty($userId, $productItemId, $newQuantity)
     {
 
+        // Check if productitem has enough for newquantity 
+        $productItem = ProductItem::find($productItemId);
+        if ($newQuantity > $productItem->qty_in_stock) {
+            return "FAILED!!!!!!!"; // Or throw an exception or return an error response
+        }
+
         $shoppingCart = ShoppingCart::where('user_id', $userId)->first();
 
         $cartItem = ShoppingCartItem::where('cart_id', $shoppingCart->id)
@@ -123,7 +137,14 @@ class CartService
     }
 
     public function replaceCartItem($userId, $oldProductItemId, $newProductItemId)
-    {
+    {   
+        // Check if new Item has enough quantity from old Item
+        $oldProductItem = ProductItem::find($oldProductItemId);
+        $newProductItem = ProductItem::find($newProductItemId);
+        if ($oldProductItem->qty_in_stock > $newProductItem->qty_in_stock) {
+            return "FAILED!!!!!!!"; // Or throw an exception or return an error response
+        }
+
         $shoppingCart = ShoppingCart::where('user_id', $userId)->first();
 
         $oldCartItem = ShoppingCartItem::where('cart_id', $shoppingCart->id)

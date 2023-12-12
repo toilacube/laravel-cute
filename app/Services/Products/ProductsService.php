@@ -28,8 +28,17 @@ class ProductsService
     {
 
         $categoryId = ProductCategory::where('category_slug', $category_slug)->first()->id;
+        // list all children of category
+        $children = ProductCategory::where('parent_category_id', $categoryId)->get();
 
-        $products = Product::where('category_id', $categoryId)->get();
+        $products = Product::where('category_id', $categoryId)
+            ->orWhere(function ($query) use ($children) {
+                foreach ($children as $child) {
+                    $query->orWhere('category_id', $child->id);
+                }
+            })
+            ->get();
+
 
         $productsDTO = [];
 
@@ -45,34 +54,55 @@ class ProductsService
                 //$product->product_items
             );
 
-            ProductItem::where('product_id', $product->id)->get()
-                ->map(function ($productItem) use ($productDTO) {
+            // get all the color of this product
+            $colorList = ProductItem::where('product_id',   $product->id)
+                ->distinct('color')
+                ->pluck('color');
 
-                    $itemImages = [];
+            // get all the size and corresponding item_id of each color if qty > 0
+            foreach ($colorList as $color) {
 
-                    $images = ProductItemImage::where('product_item_id', $productItem->id)->get();
-                    foreach ($images as $image) {
-                        $itemImage = new ItemImageDTO(
-                            $image->id,
-                            $image->product_item_id,
-                            $image->url,
-                        );
-                        $itemImages[] = $itemImage->toArray();
-                    }
+                $sizesAndIds = ProductItem::where('color', $color)
+                    ->where('product_id',  $product->id)
+                    ->where('qty_in_stock', '>', 0)
+                    ->select('size', DB::raw('MIN(id) as id'))
+                    ->groupby('size')
+                    ->get();
 
-                    $productItemDTO = new ProductItemDTO(
-                        $productItem->id,
-                        $productItem->product_id,
-                        $productItem->size,
-                        $productItem->color,
-                        $productItem->color_image,
-                        $productItem->qty_in_stock,
-                        null,
-                        null,
-                        $itemImages
-                    );
-                    $productDTO->productItems[] =  $productItemDTO->toArray();
-                });
+                $sizes = [];
+                $itemIds = [];
+
+                foreach ($sizesAndIds as $sizeAndId) {
+                    $sizes[] = $sizeAndId->size;
+                    $itemIds[] = $sizeAndId->id;
+                }
+
+              
+
+
+                $item = ProductItem::where('id', $itemIds[0])
+                    ->first();
+
+                $itemImages = ProductItemImage::where('product_item_id', $item->id)->get();
+                $images = [];
+                foreach($itemImages as $itemImage){
+                    $images[] = $itemImage->url;
+                }
+                $productItemDTO = new ProductItemDTO(
+                    $item->id,
+                    $item->product_id,
+                    $item->size,
+                    $sizes,
+                    $itemIds,
+                    $item->color,
+                    $item->color_image,
+                    $item->qty_in_stock,
+                    null,
+                    null,
+                    $images
+                );
+                $productDTO->productItems[] =  $productItemDTO->toArray();
+            }
 
             $productsDTO[] = $productDTO->toArray();
         }
@@ -206,7 +236,7 @@ class ProductsService
             $productItemId = $productItem->id;
 
             foreach ($productItemDTO->getImages() as $image) {
-                $link =Cloudinary::upload($image)->getSecurePath();
+                $link = Cloudinary::upload($image)->getSecurePath();
                 ProductItemImage::create([
                     'product_item_id' => $productItemId,
                     'url' => $link,

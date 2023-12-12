@@ -12,23 +12,23 @@ class CategoryService
 
     public function index()
     {
-        $categories = ProductCategory::with('categories')->get();
+        $categories = ProductCategory::get();
         //return  $categories;
-        foreach ($categories as $category) {
-            $categoryDTO = new CategoryDTO(
-                $category->id,
-                $category->category_name,
-                $category->category_slug
-            );
-            if (!isset($category->categories)) {
-                $categoryDTO->children = [];
-            } else {
-                $categoryDTO->children = $this->getChildren($category->categories);
-            }
-            $categoryDTOs[] = $categoryDTO->toArray();
-        }
+        // foreach ($categories as $category) {
+        //     $categoryDTO = new CategoryDTO(
+        //         $category->id,
+        //         $category->category_name,
+        //         $category->category_slug
+        //     );
+        //     if (!isset($category->categories)) {
+        //         $categoryDTO->children = [];
+        //     } else {
+        //         $categoryDTO->children = $this->getChildren($category->categories);
+        //     }
+        //     $categoryDTOs[] = $categoryDTO->toArray();
+        // }
 
-        return $categoryDTOs;
+        return $categories;
     }
 
     public function getChildren($categories)
