@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\DTOs\Requests\RegisterDTO;
 use App\Services\Auth\AuthService;
 use App\Services\User\UserService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redis;
 use App\DTOs\Requests\PasswordChangeDTO;
 
 class AuthController extends Controller
@@ -53,10 +55,17 @@ class AuthController extends Controller
         return $responseArray['access_token'];
     }
 
-    public function test(Request $request)
+    public function logout(Request $request)
     {
-        $test = $request->input('test');
-        return response($test, 200);
+        return "logout";
+        $token = Auth::getToken();
+        if($token){
+            Redis::set("".$token, 'blacked');
+            Redis::expire("".$token, 60 * 60);
+            return $token;
+        }
+        
+        return FALSE;
     }
 
     public function register(Request $request)
@@ -88,18 +97,6 @@ class AuthController extends Controller
     public function me()
     {
         return response()->json(Auth::user());
-    }
-
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function logout()
-    {
-        Auth::logout();
-
-        return response()->json(['message' => 'Successfully logged out']);
     }
 
     public function changepassword(Request $request)

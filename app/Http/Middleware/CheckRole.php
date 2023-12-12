@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 // use Tymon\JWTAuth\Contracts\Providers\Auth;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redis;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
@@ -17,7 +18,7 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, $role): Response
     {
-       if (Auth::check()) {
+       if (Auth::check() && !Redis::exists(Auth::getToken())) {
         $user = Auth::user();
 
         if($user->role === 'admin'){

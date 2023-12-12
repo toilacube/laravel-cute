@@ -8,7 +8,7 @@ use App\Http\Controllers\Category\CategoryController;
 
 
 
-Route::middleware('auth')->prefix('category')->group(function () {
+Route::middleware('role:admin')->prefix('category')->group(function () {
 
     Route::post('add', [CategoryController::class, 'add']);
 

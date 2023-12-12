@@ -11,13 +11,11 @@ use App\Http\Controllers\Auth\PasswordResetController;
 
 Route::group([
 
-    'prefix' => 'auth'
+    'prefix' => 'auth',
 
 ], function ($router) {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
-    Route::get('test', [AuthController::class, 'test']);
-
 
     Route::post('forgotpassword', [PasswordResetController::class, 'forgotPassword']);
     Route::post('resetpassword', [PasswordResetController::class, 'resetpassword']);
@@ -29,7 +27,7 @@ Route::group([
 
 
 Route::group([
-    'middleware' => 'auth',
+    'middleware' => 'role:user',
     'prefix' => 'auth'
 ], function ($router) {
 

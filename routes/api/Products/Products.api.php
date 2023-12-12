@@ -15,6 +15,5 @@ Route::middleware('role:admin')->prefix('product')->group(function () {
 
     Route::post('/add', [ProductsController::class, 'add']);
 
-    // TODO update product
     Route::put('/update', [ProductsController::class, 'update']);
 });
