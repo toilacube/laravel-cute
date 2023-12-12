@@ -11,10 +11,8 @@ class VnPayController
 {
     public function vnpay_create_payment(Request $request)
     {
-
-
         $currentBillId = ShopOrder::max('id');
-        $billId = $currentBillId + 2;
+        $billId = ($currentBillId + 1).':'.time();
 
         $vnp_TmnCode = env('VNPAY_TMNCODE'); //Mã website tại VNPAY 
         $vnp_HashSecret = env('VNPAY_HASHSECRET'); //Chuỗi bí mật
