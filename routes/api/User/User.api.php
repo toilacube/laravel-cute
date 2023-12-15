@@ -13,7 +13,8 @@ Route::group([
     Route::put('updateInfo', [UserController::class, 'updateInfo']);
     Route::get('getAddresses', [UserController::class, 'getAddresses']);
     Route::post('addAddress', [UserController::class, 'addAddress']);
-    Route::post('MakeAAddress', [UserController::class, 'updateAddress']);
-    Route::delete('delddressDefault', [UserController::class, 'MakeAddressDefault']);
-    Route::put('updateeteAddress/{addressId}', [UserController::class, 'deleteAddress']);
+
+    Route::post('makeAddressDefault', [UserController::class, 'makeAddressDefault']);
+    Route::delete('deleteAddress/{addressId}', [UserController::class, 'deleteAddress']);
+    Route::put('updateAddress', [UserController::class, 'updateAddress']);
   });

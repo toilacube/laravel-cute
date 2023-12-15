@@ -60,12 +60,21 @@ class UserService
             'phone_number' => $addressDTO->getPhoneNumber(),
             'is_default' => $addressDTO->isDefault(),
         ]);
-        $user = User::find($userId);
-        $user->addresses()->attach($address->id, ['is_default' => $addressDTO->isDefault()]);
+
+        // $user = User::find($userId);
+        // $user->addresses()->attach($address->id, ['is_default' => $addressDTO->isDefault()]);
+
+        //if isDefault == 1, set all other addresses to isDefault = 0
+        if ($addressDTO->isDefault() == 1) {
+            UserAddress::where('user_id', $userId)
+                ->where('address_id', '!=', $address->id)
+                ->update(['is_default' => 0]);
+        }
+
         return $this->true;
     }
 
-    public function MakeAddressDefault($userId, $addressId)
+    public function makeAddressDefault($userId, $addressId)
     {
         $user = User::find($userId);
         $user->addresses()->updateExistingPivot($addressId, ['is_default' => 1]);
