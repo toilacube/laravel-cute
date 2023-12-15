@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $order_date
  * @property int|null $payment_method
  * @property string|null $shipping_address
+ * @property string|null $name
+ * @property string|null $phone
+ * @property string|null $email
  * @property int|null $shipping_method
  * @property int|null $order_total
  * @property int|null $order_status
@@ -46,6 +49,9 @@ class ShopOrder extends Model
 		'order_date',
 		'payment_method',
 		'shipping_address',
+		'name',
+		'phone',
+		'email',
 		'shipping_method',
 		'order_total',
 		'order_status'

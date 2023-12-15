@@ -18,7 +18,8 @@ class OrderController extends Controller {
     }
 
     public function getAll(){
-        return $this->orderService->getAll();
+        return 1;
+        //return $this->orderService->getAll();
     }
 
     public function updateStatus(Request $request){
@@ -31,8 +32,11 @@ class OrderController extends Controller {
         $userId = Auth::id();
         $AddOrderDTO = new AddOrderDTO(
             $request->shippingAddress,
+            $request->name,
+            $request->phone,
+            $request->email,
             $request->paymentMethod,
-            $request->shippingMethod
+            $request->shippingMethod,
         );
         return $this->orderService->create($userId, $AddOrderDTO);
     }

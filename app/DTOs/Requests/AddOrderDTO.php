@@ -1,20 +1,44 @@
 <?php
+
 namespace App\DTOs\Requests;
+
 class AddOrderDTO
 {
     private $shippingAddress;
     private $paymentMethod;
     private $shippingMethod;
+    private $name;
+    private $phone;
+    private $email;
 
-    public function __construct($shippingAddress, $paymentMethod, $shippingMethod)
+    public function __construct($shippingAddress, $paymentMethod, $shippingMethod, $name, $phone, $email)
     {
         $this->shippingAddress = $shippingAddress;
+        $this->name = $name;
+        $this->phone = $phone;
+        $this->email = $email;
         $this->paymentMethod = $paymentMethod;
         $this->shippingMethod = $shippingMethod;
     }
 
+
     // Getters and setters for each property if needed
     // For simplicity, using public properties here
+
+    public function getName()
+    {
+        return $this->name;
+    }
+    //get mail
+    public function getEmail()
+    {
+        return $this->email;
+    }
+    //get phone
+    public function getPhone()
+    {
+        return $this->phone;
+    }
 
     public function getShippingAddress()
     {

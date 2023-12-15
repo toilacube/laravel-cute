@@ -41,9 +41,9 @@ class AuthController extends Controller
 
         $token = Auth::claims(['role' => $userRole])->attempt($credentials);
 
-   
-
-        return response()->json(['token'=> $token, 'isAdmin' => $userRole]);
+        if($userRole == 'admin') $isAdmin = 1;
+        else $isAdmin = 0;
+        return response()->json(['token'=> $token, 'isAdmin' => $isAdmin]);
     }
 
     public function logout(Request $request)
