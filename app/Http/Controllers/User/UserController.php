@@ -9,6 +9,7 @@ use App\DTOs\Requests\AddAddressDTO;
 use App\DTOs\Requests\UpdateUserDTO;
 use App\Http\Controllers\Controller;
 use App\DTOs\Requests\UpdateAddressDTO;
+use PDO;
 
 class UserController extends Controller
 {
@@ -94,5 +95,9 @@ class UserController extends Controller
         $addressId = $request->addressId;
         $address = $this->userService->deleteAddress($userId, $addressId);
         return $address;
+    }
+
+    public function getAll(){
+        return 'ok';
     }
 }

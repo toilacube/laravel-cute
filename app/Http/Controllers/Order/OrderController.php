@@ -5,24 +5,30 @@ use Illuminate\Http\Request;
 use App\DTOs\Requests\AddOrderDTO;
 use App\Http\Controllers\Controller;
 use App\Services\Order\OrderService;
+use App\Services\User\UserService;
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller {
-    public function __construct(private OrderService $orderService)
+    public function __construct(private OrderService $orderService,
+)
     {
+
     }
 
     public function get(){
         $userId = Auth::id();
+
         return $this->orderService->get($userId);
     }
 
     public function getAll(){
-        return 1;
-        //return $this->orderService->getAll();
+        
+
+        return $this->orderService->getAll();
     }
 
     public function updateStatus(Request $request){
+
         $orderId = $request->orderId ;
         $orderStatus = $request->status;
         return $this->orderService->updateStatus($orderId, $orderStatus);
@@ -39,6 +45,10 @@ class OrderController extends Controller {
             $request->shippingMethod,
         );
         return $this->orderService->create($userId, $AddOrderDTO);
+    }
+
+    public function vnpayConfirmPayment(Request $request){
+        return $this->orderService->vnpayConfirmPayment($request);
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Order\OrderService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 
