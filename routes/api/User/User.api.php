@@ -18,3 +18,11 @@ Route::group([
     Route::delete('deleteAddress/{addressId}', [UserController::class, 'deleteAddress']);
     Route::put('updateAddress', [UserController::class, 'updateAddress']);
   });
+
+  Route::group([
+    'middleware' => 'role:admin',
+    'prefix' => 'user'
+], function ($router) {
+
+    Route::get('getAllUser', [UserController::class, 'getAllUsers']);
+});

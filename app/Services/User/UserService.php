@@ -108,4 +108,10 @@ class UserService
         if($user) return $this->true;
         else return $this->false;
     }
+
+    public function getAllUsers()
+    {
+        $users = User::all();
+        return $users;
+    }
 }

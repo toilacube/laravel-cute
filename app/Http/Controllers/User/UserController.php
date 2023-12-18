@@ -100,4 +100,26 @@ class UserController extends Controller
     public function getAll(){
         return 'ok';
     }
+
+    public function getAllUsers(Request $request)
+    {
+        $users = $this->userService->getAllUsers();
+
+        $userDTOs = [];
+        foreach($users as $user){
+            $userDTO = new UserInfoDTO(
+                $user->name,
+                null,
+                $user->email,
+                $user->phone_number,
+                $user->birth,
+                $user->gender,
+                $user->weight,
+                $user->height,
+            );
+            $userDTOs[] = $userDTO->toArray();
+        }
+        return $userDTOs;
+    }
+
 }
