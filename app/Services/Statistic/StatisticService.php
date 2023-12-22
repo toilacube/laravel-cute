@@ -39,6 +39,33 @@ class StatisticService
 
         return $lifetimeSales->toArray();
     }
+    public function bestSellers()
+    {
+        // select top 5 sum(qty) from OrderLine group by product_id order by sum(qty) desc
+        $results = OrderLine::selectRaw('product_item_id, SUM(qty) as quantinty')
+            ->groupBy('product_item_id')
+            ->orderByDesc('quantinty')
+            ->limit(20)
+            ->get();
+
+        $statistic = [];
+
+        foreach ($results as $result) {
+            $productItem = ProductItem::where('id', $result->product_item_id)->with('product')->with('product_item_images')->first();
+            //return $productItem;
+            $bestSellerDTO = new BestSellerDTO(
+                $result->product_item_id,
+                $result->quantinty,
+                $productItem->product->name,
+                $productItem->product_item_images[0]->url,
+                $productItem->product->price_int
+            );
+
+            $statistic[] = $bestSellerDTO->toArray();
+        }
+
+        return response()->json(['data' => $statistic]);
+    }
 
     public function saleStatistic($period)
     {
@@ -92,8 +119,8 @@ class StatisticService
 
         $results = DB::table('shop_order')
             ->selectRaw('WEEK(order_date) as week,MIN(DATE(order_date)) as date, SUM(order_total) as totalSales, COUNT(*) as count')
-            ->whereBetween('order_date', [$last7Weeks, $currentDate])
             ->groupBy('week')
+            ->whereBetween('order_date', [$last7Weeks, $currentDate])
             ->orderByDesc('week')
             ->get();
 
@@ -139,31 +166,5 @@ class StatisticService
         return response()->json(['data' => $statistic]);
     }
 
-    public function bestSellers()
-    {
-        // select top 5 sum(qty) from OrderLine group by product_id order by sum(qty) desc
-        $results = OrderLine::selectRaw('product_item_id, SUM(qty) as quantinty')
-            ->groupBy('product_item_id')
-            ->orderByDesc('quantinty')
-            ->limit(20)
-            ->get();
 
-        $statistic = [];
-
-        foreach ($results as $result) {
-            $productItem = ProductItem::where('id', $result->product_item_id)->with('product')->with('product_item_images')->first();
-            //return $productItem;
-            $bestSellerDTO = new BestSellerDTO(
-                $result->product_item_id,
-                $result->quantinty,
-                $productItem->product->name,
-                $productItem->product_item_images[0]->url,
-                $productItem->product->price_int
-            );
-
-            $statistic[] = $bestSellerDTO->toArray();
-        }
-
-        return response()->json(['data' => $statistic]);
-    }
 }
