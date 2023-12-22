@@ -23,7 +23,10 @@ class ProductsController extends Controller
      */
     public function products(Request $request)
     {
-        return  $this->productsService->products($request->category_slug);
+        if ($request->has('filter')) {
+            return $this->productsService->products($request->category_slug, $request->filter);
+        } else
+            return $this->productsService->products($request->category_slug, "false");
     }
 
 
@@ -58,6 +61,7 @@ class ProductsController extends Controller
 
     public function add(Request $request)
     {
+        return $request;
         $productDTO = new AddProductDTO(
             $request->CategoryId,
             $request->Name,
@@ -110,6 +114,4 @@ class ProductsController extends Controller
             return $this->productsService->add($productDTO, $productItemDTO);
         }
     }
-
-
 }
