@@ -1,0 +1,27 @@
+Response: {"message":"Order successfully"}
+Response: {"message":"Order successfully"}
+Response: {"message":"Order successfully"}
+Response: Cart is empty
+Response: Cart is empty
+Response: {"message":"Order successfully"}
+Response: Cart is empty
+Response: {"message":"Order successfully"}
+Response: Cart is empty
+Response: Cart is empty
+Response: Cart is empty
+Response: Cart is empty
+Response: Cart is empty
+Response: Cart is empty
+Response: Cart is empty
+Response: Cart is empty
+Response: Cart is empty
+Response: Cart is empty
+Response: Not enough qty in stock for item id5
+Response: Not enough qty in stock for item id5
+Response: Not enough qty in stock for item id5
+Response: Not enough qty in stock for item id5
+Response: Not enough qty in stock for item id5
+Response: Cart is empty
+Response: Cart is empty
+Response: Cart is empty
+Response: Cart is empty
