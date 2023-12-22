@@ -12,7 +12,6 @@ Route::prefix('review')->group(function () {
 
 Route::middleware('role:user')->prefix('review')->group(function () {
 
-    // TODO: all this below route
     Route::post('add', [ReviewController::class, 'add']);
     Route::put('update', [ReviewController::class, 'update']);
     Route::delete('delete', [ReviewController::class, 'delete']);
