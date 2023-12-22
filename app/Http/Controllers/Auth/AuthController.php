@@ -48,12 +48,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        return "logout";
         $token = Auth::getToken();
         if($token){
             Redis::set("".$token, 'blacked');
-            Redis::expire("".$token, 60 * 60);
-            return $token;
+            Redis::expire("".$token, 60 * 60 * 24);
+            return TRUE;
         }
         
         return FALSE;
