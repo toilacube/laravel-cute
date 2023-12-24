@@ -72,7 +72,7 @@ class UserController extends Controller
     public function makeAddressDefault(Request $request)
     {
         $userId = $request->user()->id;
-        $addressId = $request->getContent();
+        $addressId = $request->addressId;
         $address = $this->userService->makeAddressDefault($userId, $addressId);
         return $address;
     }

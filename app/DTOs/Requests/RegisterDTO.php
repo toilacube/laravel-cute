@@ -4,14 +4,16 @@ namespace App\DTOs\Requests;
 
 class RegisterDTO
 {
-    private  $email;
-    private $password;
+    public  $email;
+    public $password;
+    public $role;
 
 
-    public function __construct(string $email, string $password)
+    public function __construct(string $email, string $password, $role)
     {
         $this->email = $email;
         $this->password = $password;
+        $this->role = $role;
     }
 
 

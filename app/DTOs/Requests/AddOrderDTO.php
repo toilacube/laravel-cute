@@ -11,7 +11,7 @@ class AddOrderDTO
     private $phone;
     private $email;
 
-    public function __construct($shippingAddress, $paymentMethod, $shippingMethod, $name, $phone, $email)
+    public function __construct($shippingAddress, $name, $phone, $email, $paymentMethod, $shippingMethod,)
     {
         $this->shippingAddress = $shippingAddress;
         $this->name = $name;

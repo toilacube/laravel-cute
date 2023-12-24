@@ -12,7 +12,7 @@ Route::middleware('role:user')->prefix('cart')->group(function () {
 
     Route::get('/', [CartController::class, 'cart']);
 
-    Route::post('/add', [CartController::class, 'addToCart']);
+    Route::post('add', [CartController::class, 'addToCart']);
 
     Route::put('/updateQty', [CartController::class, 'updateQty']);
 

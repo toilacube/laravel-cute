@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleController extends Controller
@@ -17,6 +18,7 @@ class GoogleController extends Controller
     {
         try {
             $url = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
+            //eturn Redirect::away($url);
             return response()->json([
                 'url' => $url,
             ])->setStatusCode(Response::HTTP_OK);
@@ -40,7 +42,8 @@ class GoogleController extends Controller
                 $token = JWTAuth::fromUser($user);
 
                 // Optionally, return the JWT token
-                return response( $token );
+            
+                return response($token);
             }
             $user = User::create(
                 [
@@ -54,6 +57,7 @@ class GoogleController extends Controller
                 'status' => __('google sign in successful'),
                 'data' => $user,
             ], Response::HTTP_CREATED);
+
         } catch (\Exception $exception) {
             return response()->json([
                 'status' => __('google sign in failed'),

@@ -21,7 +21,7 @@ Route::group([
     Route::post('resetpassword', [PasswordResetController::class, 'resetpassword']);
 
 
-    Route::post('/google/get-google-sign-in-url', [GoogleController::class, 'getGoogleSignInUrl']);
+    Route::get('google-login', [GoogleController::class, 'getGoogleSignInUrl']);
     Route::get('/google/callback', [GoogleController::class, 'loginCallback']);
 });
 

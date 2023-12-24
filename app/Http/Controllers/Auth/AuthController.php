@@ -41,20 +41,20 @@ class AuthController extends Controller
 
         $token = Auth::claims(['role' => $userRole])->attempt($credentials);
 
-        if($userRole == 'admin') $isAdmin = 1;
-        else $isAdmin = 0;
-        return response()->json(['token'=> $token, 'isAdmin' => $isAdmin]);
+        if ($userRole == 'admin') $isAdmin = 'true';
+        else $isAdmin = 'False';
+        return response()->json(['token' => $token, 'isAdmin' => $isAdmin]);
     }
 
     public function logout(Request $request)
     {
         $token = Auth::getToken();
-        if($token){
-            Redis::set("".$token, 'blacked');
-            Redis::expire("".$token, 60 * 60 * 24);
+        if ($token) {
+            Redis::set("" . $token, 'blacked');
+            Redis::expire("" . $token, 60 * 60 * 24);
             return TRUE;
         }
-        
+
         return FALSE;
     }
 
@@ -66,8 +66,9 @@ class AuthController extends Controller
         }
 
         $registerDTO = new RegisterDTO(
-            $request->input('email'),
-            $request->input('password')
+            $request->email,
+            $request->password,
+            'user'
         );
 
         $user = $this->userService->createUser($registerDTO);

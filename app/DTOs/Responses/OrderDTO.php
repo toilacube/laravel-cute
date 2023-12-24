@@ -3,32 +3,32 @@ namespace App\DTOs\Responses;
 
 class OrderDTO
 {
-    public int $id;
-    public string $shippingAddress;
-    private string $name;
-    private string $phone;
-    private string $email;
-    public int $paymentMethod;
-    public int $shippingMethod;
-    public string $userId;
-    public float $orderTotal;
-    public string $orderDate;
-    public int $orderStatus;
-    public array $orderLines; // Array of OrderLineDTO objects
+    public ?int $id;
+    public ?string $shippingAddress;
+    private ?string $name;
+    private ?string $phone;
+    private ?string $email;
+    public ?int $paymentMethod;
+    public ?int $shippingMethod;
+    public ?string $userId;
+    public ?float $orderTotal;
+    public ?string $orderDate;
+    public ?int $orderStatus;
+    public ?array $orderLines; // Array of OrderLineDTO objects
 
     public function __construct(
-        int $id,
-        string $shippingAddress,
-        string $name,
-        string $phone,
-        string $email,
-        int $paymentMethod,
-        int $shippingMethod,
-        string $userId,
-        float $orderTotal,
-        string $orderDate,
-        int $orderStatus,
-        array $orderLines
+        ?int $id,
+        ?string $shippingAddress,
+        ?string $name,
+        ?string $phone,
+        ?string $email,
+        ?int $paymentMethod,
+        ?int $shippingMethod,
+        ?string $userId,
+        ?float $orderTotal,
+        ?string $orderDate,
+        ?int $orderStatus,
+        ?array $orderLines
     ) {
         $this->id = $id;
         $this->shippingAddress = $shippingAddress;

@@ -4,6 +4,7 @@ namespace App\Services\Products;
 
 use App\Models\ProductItem;
 use App\Models\ProductItemImage;
+use App\DTOs\Responses\GetAllItemsDTO;
 use App\DTOs\Requests\ProductItemReqDTO;
 use App\DTOs\Responses\ProductItemResDTO;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
@@ -12,6 +13,28 @@ class ProductItemService
 {
     private $true = "Successfull";
     private $false = "Failed";
+
+    public function index()
+    {
+        // return all product items
+        $items = ProductItem::with('product')->get();
+        $itemDTOs = [];
+        foreach ($items as $item) {
+            $getAllItem = new GetAllItemsDTO(
+                $item->id,
+                $item->product_id,
+                $item->size,
+                $item->color,
+                $item->color_image,
+                $item->qty_in_stock,
+                $item->product->name,
+                $item->product->price_str,
+            );
+            array_push($itemDTOs, $getAllItem->toArray());
+        }
+
+        return $itemDTOs;
+    }
 
     public function show($itemId)
     {
@@ -51,6 +74,19 @@ class ProductItemService
         }
     }
 
+    public function updateQtyOfListItem($items)
+    {
+        $items = json_decode($items);
+        
+        foreach($items as $item){
+            $itemId = $item->productItemId;
+            $newQty = $item->newQty;
+            $this->updateQtyInStock($itemId, $newQty);
+        }
+        return $this->true;
+
+    }
+
     public function add($productItemDTO)
     {
 
@@ -69,7 +105,7 @@ class ProductItemService
         foreach ($itemImages as $image) {
             $itemImage = new ProductItemImage();
             $itemImage->product_item_id = $item->id;
-            
+
             $img_link = Cloudinary::upload($image->getRealPath())->getSecurePath();
             $itemImage->url = $img_link;
 

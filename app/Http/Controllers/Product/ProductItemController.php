@@ -10,6 +10,10 @@ class ProductItemController extends Controller{
     public function __construct(private ProductItemService $productItemService)
     {
     }
+
+    public function index(){
+        return $this->productItemService->index();
+    }
    
     public function show(Request $request)
     {
@@ -22,6 +26,10 @@ class ProductItemController extends Controller{
         $itemId = $request->id;
         $qtyInStock = $request->qtyInStock;
         return $this->productItemService->updateQtyInStock($itemId, $qtyInStock);
+    }
+
+    public function updateQtyOfListItem(Request $request){
+        return $this->productItemService->updateQtyOfListItem($request->getContent());
     }
 
     public function add(Request $request)

@@ -61,7 +61,6 @@ class ProductsController extends Controller
 
     public function add(Request $request)
     {
-        return $request;
         $productDTO = new AddProductDTO(
             $request->CategoryId,
             $request->Name,
@@ -110,6 +109,8 @@ class ProductsController extends Controller
                 }
                 $productItemDTO->setImages($images);
             }
+
+            //return $productDTO->toArray();
 
             return $this->productsService->add($productDTO, $productItemDTO);
         }

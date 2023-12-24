@@ -64,7 +64,7 @@ class StatisticService
             $statistic[] = $bestSellerDTO->toArray();
         }
 
-        return response()->json(['data' => $statistic]);
+        return response($statistic);
     }
 
     public function saleStatistic($period)
@@ -99,7 +99,7 @@ class StatisticService
             ->selectRaw('DATE(order_date) as date, SUM(order_total) as totalSales, COUNT(*) as count')
             ->whereBetween('order_date', [$last7Days, $currentDate])
             ->groupBy('date')
-            ->orderByDesc('date')
+            ->orderBy('date')
             ->get();
         $statistic = [];
         foreach ($results as $result) {
@@ -121,13 +121,13 @@ class StatisticService
             ->selectRaw('WEEK(order_date) as week,MIN(DATE(order_date)) as date, SUM(order_total) as totalSales, COUNT(*) as count')
             ->groupBy('week')
             ->whereBetween('order_date', [$last7Weeks, $currentDate])
-            ->orderByDesc('week')
+            ->orderBy('week')
             ->get();
 
         $statistic = [];
         foreach ($results as $result) {
             $statistic[] = [
-                'date' => $result->date,
+                'time' => $result->date,
                 'totalSales' => $result->totalSales,
                 'count' => $result->count
             ];
@@ -152,13 +152,13 @@ class StatisticService
             ->selectRaw('MONTH(order_date) as mo, MIN(DATE(order_date)) as date, SUM(order_total) as totalSales, COUNT(*) as count')
             ->whereBetween('order_date', [$firstDateOfMonth, $fromDate]) // Filter for the last 7 months
             ->groupBy('mo')
-            ->orderByDesc('mo')
+            ->orderBy('mo')
             ->get();
 
         $statistic = [];
         foreach ($results as $result) {
             $statistic[] = [
-                'date' => $result->date,
+                'time' => $result->date,
                 'totalSales' => $result->totalSales,
                 'count' => $result->count
             ];

@@ -64,9 +64,8 @@ class CartController extends Controller
 
         $userId = Auth::id();
 
-        $rawData = $request->getContent();
 
-        $productItemId = (int)$rawData;
+        $productItemId = $request->productItemId;
 
         return $this->cartService->removeCartItem($userId, $productItemId);
     }

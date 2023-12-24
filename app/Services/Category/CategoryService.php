@@ -15,16 +15,17 @@ class CategoryService
         $categories = ProductCategory::get();
         //return  $categories;
         foreach ($categories as $category) {
+            if ($category->parent_category_id != null) {
+                continue;
+            }
             $categoryDTO = new CategoryDTO(
                 $category->id,
                 $category->category_name,
                 $category->category_slug
             );
-            if (!isset($category->categories)) {
-                $categoryDTO->children = [];
-            } else {
-                $categoryDTO->children = $this->getChildren($category->categories);
-            }
+
+            $categoryDTO->children = $this->getChildren($category->categories);
+
             $categoryDTOs[] = $categoryDTO->toArray();
         }
 
