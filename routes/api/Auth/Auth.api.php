@@ -22,7 +22,7 @@ Route::group([
 
 
     Route::get('google-login', [GoogleController::class, 'getGoogleSignInUrl']);
-    Route::get('/google/callback', [GoogleController::class, 'loginCallback']);
+    Route::get('google/callback', [GoogleController::class, 'loginCallback']);
 });
 
 

@@ -46,6 +46,17 @@ class ReviewController extends Controller
         return $this->reviewService->add($addReviewDTO);
     }
 
+    public function addItem(Request $request)
+    {
+        $addReviewDTO = new AddReviewDTO(
+            $request->productItemId,
+            $request->ratingValue,
+            $request->comment
+        );
+
+        return $this->reviewService->addItem($addReviewDTO);
+    }
+
     public function update(Request $request)
     {
         $updateReviewDTO = new UpdateReviewDTO(

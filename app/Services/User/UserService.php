@@ -22,6 +22,7 @@ class UserService
         return User::create([
             'email' => $registerDTO->getEmail(),
             'password' => bcrypt($registerDTO->getPassword()),
+            'role' => 'user',
         ]);
     }
 
@@ -39,6 +40,8 @@ class UserService
         $userAddresses = (User::where('id', $userId)->with('addresses')->get()[0]['addresses']);
         foreach ($userAddresses as $address) {
             $addressDTO = new AddressDTO(
+                $address['pivot']['name'],
+                $address['pivot']['phone_number'],
                 $address['id'],
                 $address['address_line'],
                 $address['pivot']['is_default']
@@ -94,7 +97,7 @@ class UserService
             'name' => $addressDTO->getName(),
             'phone_number' => $addressDTO->getPhoneNumber(),
         ]);
-        if($user)
+        if ($user)
             return $this->true;
         else
             return $this->false;
@@ -105,7 +108,7 @@ class UserService
         $user = User::find($userId);
         $user->addresses()->detach($addressId);
 
-        if($user) return $this->true;
+        if ($user) return $this->true;
         else return $this->false;
     }
 

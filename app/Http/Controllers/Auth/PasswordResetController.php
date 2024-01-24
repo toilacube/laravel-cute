@@ -23,6 +23,8 @@ class PasswordResetController extends Controller
             $request->only('email')
         );
 
+        return "Password reset token sent successfully";
+
         return $status === Password::RESET_LINK_SENT
             ? back()->with(['status' => __($status)])
             : back()->withErrors(['email' => __($status)]);
@@ -30,14 +32,18 @@ class PasswordResetController extends Controller
 
     public function resetPassword(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'token' => 'required',
-            'password' => 'required',
-        ]);
+        // $request->validate([
+        //     'email' => 'required|email',
+        //     'token' => 'required',
+        //     'newPassword' => 'required',
+        // ]);
+
+        $email = $request->input('email');
+        $password = $request->input('newPassword');
+        $token = $request->input('token');
 
         $status = Password::reset(
-            $request->only('email', 'password', 'token'),
+            compact('email', 'password', 'token'),
             function ($user, $password) {
                 $user->forceFill([
                     'password' => bcrypt($password),

@@ -70,16 +70,16 @@ class ProductsController extends Controller
             $request->ProductItems
         );
 
-        $url = '';
-        $color = "";
-        $qty = 0;
-        $images = [];
-        $sizes = [];
 
         $productItemDTO = new AddProductItemDTO();
 
         foreach ($productDTO->productItems as $item) {
 
+            $url = '';
+            $color = "";
+            $qty = 0;
+            $images = [];
+            $sizes = [];
 
             if ($item['Size'] != null) {
                 foreach ($item['Size'] as $size) {
@@ -112,7 +112,8 @@ class ProductsController extends Controller
 
             //return $productDTO->toArray();
 
-            return $this->productsService->add($productDTO, $productItemDTO);
+            $this->productsService->add($productDTO, $productItemDTO);
         }
+        return "success";
     }
 }

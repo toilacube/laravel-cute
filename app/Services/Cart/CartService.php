@@ -30,6 +30,8 @@ class CartService
         foreach ($cartItems as $cartItem) {
             $img = ProductItemImage::where("product_item_id", $cartItem->product_item_id)->value('url');
 
+            $productItem = ProductItem::where('id', $cartItem->product_item_id)->first();
+
             $itemDTO = new CartProductItemDTO(
                 $cartItem->product_item_id,
                 $cartItem->product_item->product->id,
@@ -38,7 +40,7 @@ class CartService
                 $cartItem->product_item->color,
                 $cartItem->product_item->size,
                 $img,
-                $cartItem->qty
+                $cartItem->qty > $productItem->qty_in_stock ? $productItem->qty_in_stock : $cartItem->qty
             );
 
             foreach ($cartItem->product_item->product->product_items as $productItem) {
@@ -78,9 +80,8 @@ class CartService
                 ->where('product_item_id', $productItemId)
                 ->first();
 
-
-            if ($quantity > $productItem->qty_in_stock) {
-                return "FAILED!!!!!!!"; // Or throw an exception or return an error response
+            if ($quantity + $existingCartItem?->qty > $productItem->qty_in_stock) {
+                return response("Not enough item stock", 400); // Or throw an exception or return an error response
             }
 
             if ($existingCartItem) {
@@ -137,13 +138,13 @@ class CartService
     }
 
     public function replaceCartItem($userId, $oldProductItemId, $newProductItemId)
-    {   
+    {
         // Check if new Item has enough quantity from old Item
         $oldProductItem = ProductItem::find($oldProductItemId);
         $newProductItem = ProductItem::find($newProductItemId);
-        if ($oldProductItem->qty_in_stock > $newProductItem->qty_in_stock) {
-            return "FAILED!!!!!!!"; // Or throw an exception or return an error response
-        }
+        // if ($oldProductItem->qty_in_stock > $newProductItem->qty_in_stock) {
+        //     return response("not enough quantity ", 500); // Or throw an exception or return an error response
+        // }
 
         $shoppingCart = ShoppingCart::where('user_id', $userId)->first();
 
@@ -154,12 +155,17 @@ class CartService
         $newCartItem = ShoppingCartItem::where('cart_id', $shoppingCart->id)
             ->where('product_item_id', $newProductItemId)
             ->first();
+        
+        //return ($oldCartItem);
 
         if ($oldCartItem) {
             if ($newCartItem) {
                 // If both old and new items exist, update the quantity of the new item
                 $newCartItem->qty += $oldCartItem->qty;
                 $newCartItem->save();
+
+                // delete old cart item
+                $oldCartItem->delete();
             } else {
                 // If the new item doesn't exist, update the product_item_id of the old item
                 $oldCartItem->product_item_id = $newProductItemId;

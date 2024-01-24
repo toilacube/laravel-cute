@@ -104,7 +104,7 @@ class StatisticService
         $statistic = [];
         foreach ($results as $result) {
             $statistic[] = [
-                'date' => $result->date,
+                'time' => $result->date,
                 'totalSales' => $result->totalSales,
                 'count' => $result->count
             ];

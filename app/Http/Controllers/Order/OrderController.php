@@ -36,11 +36,11 @@ class OrderController extends Controller
         $orderStatus = $request->status;
         return $this->orderService->updateStatus($orderId, $orderStatus);
     }
-    public function cancellOrder(Request $request)
+    public function cancelOrder(Request $request)
     {
         $orderId = $request->orderId;
-        $orderStatus = $request->status;
-        return $this->orderService->cancellOrder($orderId, $orderStatus);
+        $orderStatus = 2;
+        return $this->orderService->cancelOrder($orderId, $orderStatus);
     }
 
     public function create(Request $request)

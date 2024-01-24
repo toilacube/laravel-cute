@@ -6,7 +6,7 @@ class AddProductDTO
 {
     public int $categoryId;
     public string $name;
-    public string $description;
+    public string | null $description;
     public int $priceInt;
     public string $priceStr;
     public array $productItems;
@@ -14,7 +14,7 @@ class AddProductDTO
     public function __construct(
         int $categoryId,
         string $name,
-        string $description,
+        ?string $description,
         int $priceInt,
         string $priceStr,
         array $productItems
@@ -49,7 +49,7 @@ class AddProductDTO
         return $this->name;
     }
 
-    public function getDescription(): string
+    public function getDescription(): string | null
     {
         return $this->description;
     }

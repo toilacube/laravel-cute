@@ -13,6 +13,8 @@ Route::prefix('review')->group(function () {
 Route::middleware('role:user')->prefix('review')->group(function () {
 
     Route::post('add', [ReviewController::class, 'add']);
+    Route::post('addItem', [ReviewController::class, 'addItem']);
+
     Route::put('update', [ReviewController::class, 'update']);
     Route::delete('delete', [ReviewController::class, 'delete']);
 });

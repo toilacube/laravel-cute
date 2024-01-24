@@ -41,7 +41,7 @@ class AuthController extends Controller
 
         $token = Auth::claims(['role' => $userRole])->attempt($credentials);
 
-        if ($userRole == 'admin') $isAdmin = 'true';
+        if ($userRole == 'admin') $isAdmin = true;
         else $isAdmin = 'False';
         return response()->json(['token' => $token, 'isAdmin' => $isAdmin]);
     }
@@ -62,19 +62,19 @@ class AuthController extends Controller
     {
         $user = User::where('email', $request->input('email'))->first();
         if ($user) {
-            return response()->json(['message' => 'User already existed'], 201);
+            return response()->json(['message' => 'User already existed'], 500);
         }
 
         $registerDTO = new RegisterDTO(
             $request->email,
             $request->password,
-            'user'
+            "user"
         );
 
         $user = $this->userService->createUser($registerDTO);
 
         if ($user) {
-            return response()->json(['message' => 'User registered successfully'], 201);
+            return response($user);
         } else {
             return response()->json(['error' => 'Failed to register user'], 500);
         }

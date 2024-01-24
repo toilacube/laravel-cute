@@ -20,6 +20,7 @@ use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
  * Class User
  * 
  * @property int $id
+ * @property string|null $role
  * @property string|null $google_id
  * @property string|null $name
  * @property string|null $email
@@ -80,6 +81,7 @@ class User extends Authenticatable implements JWTSubject, CanResetPassword
 	protected $fillable = [
 		'name',
 		'email',
+		'role',
 		'phone_number',
 		'gender',
 		'weight',

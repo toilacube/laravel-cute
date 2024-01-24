@@ -4,7 +4,7 @@ namespace App\DTOs\Requests;
 
 class RegisterDTO
 {
-    public  $email;
+    public $email;
     public $password;
     public $role;
 
@@ -25,5 +25,10 @@ class RegisterDTO
     public function getPassword()
     {
         return $this->password;
+    }
+
+    public function getRole()
+    {
+        return $this->role;
     }
 }

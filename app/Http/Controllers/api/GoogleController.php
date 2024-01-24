@@ -18,7 +18,9 @@ class GoogleController extends Controller
     {
         try {
             $url = Socialite::driver('google')->stateless()->redirect()->getTargetUrl();
-            //eturn Redirect::away($url);
+
+            return Redirect::away($url);
+
             return response()->json([
                 'url' => $url,
             ])->setStatusCode(Response::HTTP_OK);
@@ -42,7 +44,9 @@ class GoogleController extends Controller
                 $token = JWTAuth::fromUser($user);
 
                 // Optionally, return the JWT token
-            
+                $isAdmin = $user->role == 'admin' ? true : 'False';
+                return Redirect::away('http://localhost:3000/sign-in' . '?token=' . $token . '&isAdmin=' . $isAdmin);
+
                 return response($token);
             }
             $user = User::create(
@@ -57,7 +61,6 @@ class GoogleController extends Controller
                 'status' => __('google sign in successful'),
                 'data' => $user,
             ], Response::HTTP_CREATED);
-
         } catch (\Exception $exception) {
             return response()->json([
                 'status' => __('google sign in failed'),

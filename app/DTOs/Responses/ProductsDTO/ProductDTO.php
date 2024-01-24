@@ -7,7 +7,7 @@ class ProductDTO
     public int $id;
     public int $categoryId;
     public string $name;
-    public string $description;
+    public string | null $description;
     public int $priceInt;
     public string $priceStr;
     public ?string $category;
@@ -17,7 +17,7 @@ class ProductDTO
         int $id,
         int $categoryId,
         string $name,
-        string $description,
+        ?string $description,
         int $priceInt,
         string $priceStr,
         ?string $category = null,

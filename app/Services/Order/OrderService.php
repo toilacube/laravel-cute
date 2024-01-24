@@ -26,46 +26,51 @@ class OrderService
 
     public function get($userId)
     {
-        $result = ShopOrder::where('user_id', $userId)->with('order_lines')->first();
+        $results = ShopOrder::where('user_id', $userId)->with('order_lines')->orderByDesc('id')->get();
         //return  $result;  
-        $orderLines = [];
-        foreach ($result['order_lines'] as $orderLine) {
 
-            $product = ProductItem::where('id', $orderLine['product_item_id'])->with('product')->first()['product'];
-            //return $product;
-            $itemImage = ProductItem::where('id', $orderLine['product_item_id'])->with('product_item_images')->first()['product_item_images'][0]['url'];
-            //return $itemImage;
-            $item = ProductItem::where('id', $orderLine['product_item_id'])->first();
+        $all = [];
 
-            $orderLineDTO = new OrderLineDTO(
-                $orderLine['id'],
-                $orderLine['product_item_id'],
-                $product['name'],
-                $item['size'],
-                $item['color'],
-                $orderLine['qty'],
-                $orderLine['price'],
-                $itemImage
+        foreach ($results as $result) {
+            $orderLines = [];
+            foreach ($result['order_lines'] as $orderLine) {
+
+                $product = ProductItem::where('id', $orderLine['product_item_id'])->with('product')->first()['product'];
+                //return $product;
+                $itemImage = ProductItem::where('id', $orderLine['product_item_id'])->with('product_item_images')->first()['product_item_images'][0]['url'];
+                //return $itemImage;
+                $item = ProductItem::where('id', $orderLine['product_item_id'])->first();
+
+                $orderLineDTO = new OrderLineDTO(
+                    $orderLine['id'],
+                    $orderLine['product_item_id'],
+                    $product['name'],
+                    $item['size'],
+                    $item['color'],
+                    $orderLine['qty'],
+                    $orderLine['price'],
+                    $itemImage
+                );
+                $orderLines[] = $orderLineDTO->toArray();
+            }
+            $orderDTO = new OrderDTO(
+                $result['id'],
+                $result['shipping_address'],
+                $result['name'],
+                $result['phone'],
+                $result['email'],
+                $result['payment_method'],
+                $result['shipping_method'],
+                $result['user_id'],
+                $result['order_total'],
+                $result['order_date'],
+                $result['order_status'],
+                $orderLines
             );
-            $orderLines[] = $orderLineDTO->toArray();
+            $all[] = $orderDTO->toArray();
         }
 
-        $orderDTO = new OrderDTO(
-            $result['id'],
-            $result['shipping_address'],
-            $result['name'],
-            $result['phone'],
-            $result['email'],
-            $result['payment_method'],
-            $result['shipping_method'],
-            $result['user_id'],
-            $result['order_total'],
-            $result['order_date'],
-            $result['order_status'],
-            $orderLines
-        );
-
-        return  $orderDTO->toArray();
+        return  $all;
     }
 
     public function getAll()
@@ -122,7 +127,7 @@ class OrderService
         return $this->true;
     }
 
-    public function cancellOrder($orderId, $orderStatus)
+    public function cancelOrder($orderId, $orderStatus)
     {
         return $this->updateStatus($orderId, $orderStatus);
     }
@@ -148,7 +153,6 @@ class OrderService
     public function create($userId, $AddOrderDTO)
     {
         $payment = $AddOrderDTO->getPaymentMethod();
-
         $cart = $this->checkCartEmpty($userId);
         if ($cart == 0) return "Cart is empty";
         else $cart = ShoppingCart::where('user_id', $userId)->first();
@@ -162,9 +166,9 @@ class OrderService
 
                 case 0: // ship cod
                     //DB::commit();
-                    $this->deleteCart($cart->id);
                     $this->decreaseProductQty($cart->id);
-                    return 1;
+                    $this->deleteCart($cart->id);
+                    return ("Order successfully");
                     break;
 
                     //TODO: do momo payment methd (why my laptop crash when i run this code)
@@ -172,7 +176,10 @@ class OrderService
 
                     $payUrl = $this->momoCreatePayment($order->id, $order->order_total);
 
-                   // DB::commit();
+                    // DB::commit();
+                    // redirect to payurl
+                    //return redirect()->away($payUrl);
+
                     return $payUrl;
                     break;
 
@@ -187,7 +194,6 @@ class OrderService
                     // We will check if the payment is successful or not in the confirmPayment method
 
                     foreach ($itemIds as $itemId => $qty) {
-                        DB::beginTransaction();
                         try {
                             $productItem = ProductItem::where('id', $itemId)->lockForUpdate()->first(); // Use lockForUpdate to prevent race conditions
                             if ($productItem) {
@@ -196,13 +202,11 @@ class OrderService
 
                                 Redis::set("{$userId}:{$itemId}", $qty);
 
-                                DB::commit();
                                 // Everything is successful
                             } else {
                                 // Handle the case when the product item is not found
                             }
                         } catch (\Exception $e) {
-                            DB::rollBack();
                             // Handle the exception, log, or throw an error
                         }
                     }
@@ -210,6 +214,8 @@ class OrderService
                     //DB::commit();
                     return $payUrl;
                     break;
+                default:
+                    return "Payment method is not valid";
             }
         } catch (\Exception $e) {
             // DB::rollBack();
@@ -227,9 +233,10 @@ class OrderService
             $productItem = ProductItem::where('id', $cartItem['product_item_id'])->first(['qty_in_stock', 'id']);
 
             if ($productItem->qty_in_stock < $cartItem['qty']) {
-                return "Not enough qty in stock for item id" . $productItem->id;
+                return response("Not enough qty in stock for item id" . $productItem->id, 400);
             } else {
                 $productItem->qty_in_stock -= $cartItem['qty'];
+                //return $productItem->qty_in_stock;
                 $productItem->save();
                 return null; // Return null or a success message if needed
             }
@@ -282,7 +289,7 @@ class OrderService
             $qty = $cartItem->qty;
 
             if ($cartItem->product_item->qty_in_stock < $qty) {
-                return $this->false . ' ' . $cartItem->product_item->product->name . ' is out of stock';
+                return response($this->false . ' ' . $cartItem->product_item->product->name . ' is out of stock', 400);
             }
 
             $price = $cartItem->product_item->product->price_int;
@@ -386,7 +393,7 @@ class OrderService
         $vnp_TmnCode = env('VNPAY_TMNCODE'); //Mã website tại VNPAY 
         $vnp_HashSecret = env('VNPAY_HASHSECRET'); //Chuỗi bí mật
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "http://localhost:8000/api/cart/checkout/return";
+        $vnp_Returnurl = "http://localhost:3000/payment/vnpay";
 
         $vnp_TxnRef = $orderId; //Mã đơn hàng. Trong thực tế Merchant cần insert đơn hàng vào DB và gửi mã này sang VNPAY
 
@@ -503,8 +510,11 @@ class OrderService
                                 } else {
                                     //restore the item qty_in_stock
                                     foreach ($orderLines as $orderLine) {
+
                                         $productItem = ProductItem::where('id', $orderLine->product_item_id)->first();
-                                        $productItem->qty_in_stock += $orderLine->qty;
+                                        // increase qty in stock using redis
+                                        $productItem->qty_in_stock += Redis::get("{$order->user_id}:{$orderLine->product_item_id}");
+                                        Redis::del("{$order->user_id}:{$orderLine->product_item_id}");
                                         $productItem->save();
                                     }
                                     // delete shop_order

@@ -11,13 +11,13 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class OrderLine
- * 
+ *
  * @property int $id
  * @property int|null $product_item_id
  * @property int|null $order_id
  * @property int|null $qty
  * @property int|null $price
- * 
+ *
  * @property ShopOrder|null $shop_order
  * @property ProductItem|null $product_item
  * @property Collection|UserReview[] $user_reviews
@@ -34,7 +34,7 @@ class OrderLine extends Model
 		'order_id' => 'int',
 		'qty' => 'int',
 		'price' => 'int'
-	];
+    ];
 
 	protected $fillable = [
 		'product_item_id',
@@ -57,4 +57,5 @@ class OrderLine extends Model
 	{
 		return $this->hasMany(UserReview::class, 'ordered_product_id');
 	}
+
 }

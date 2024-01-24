@@ -17,24 +17,19 @@ class CartController extends Controller
 
     public function cart(Request $request)
     {
-
-
         $userId = Auth::id();
         return ($this->cartService->getUserCart($userId));
     }
 
     public function addToCart(Request $request)
     {
-        if (Auth::check()) {
-            $userId = Auth::id();
+        $userId = Auth::id();
 
-            $jsonData = $request->json()->all();
+        $jsonData = $request->json()->all();
 
-            $productItemId = $jsonData['productItemId'];
-            $quantity = $jsonData['quantity'];
-            return $this->cartService->addToCart($userId, $productItemId, $quantity);
-        } else
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $productItemId = $jsonData['productItemId'];
+        $quantity = $jsonData['quantity'];
+        return $this->cartService->addToCart($userId, $productItemId, $quantity);
     }
 
     public function updateQty(Request $request)

@@ -4,12 +4,16 @@ namespace App\DTOs\Responses;
 
 class AddressDTO
 {
+    public $name;
+    public $phoneNumber;
     private $addressId;
     private $streetLine;
     private $isDefault;
 
-    public function __construct($addressId,  $streetLine,  $isDefault)
+    public function __construct($name, $phoneNumber,$addressId,  $streetLine,  $isDefault)
     {
+        $this->name = $name;
+        $this->phoneNumber = $phoneNumber;
         $this->addressId = $addressId;
         $this->streetLine = $streetLine;
         $this->isDefault = $isDefault;
@@ -18,6 +22,8 @@ class AddressDTO
     public function toArray()
     {
         return [
+            'name' => $this->name,
+            'phoneNumber' => $this->phoneNumber,
             'addressId' => $this->addressId,
             'streetLine' => $this->streetLine,
             'isDefault' => $this->isDefault,

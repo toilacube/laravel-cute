@@ -200,6 +200,7 @@ class ProductsService
 
     public function search($searchTerm)
     {
+        if($searchTerm == null) return response([]); // return empty array if search term is null (no search term
         $products = Product::where('name', 'like', '%' . $searchTerm . '%')->get();
 
         $productsDTO = [];
