@@ -1,4 +1,4 @@
-# A RestAPI back-end service for an e-commerce website (Coolmate)
+# A RestAPI back-end service for a Clothing website 
 
 ## Table of contents:
 - [ Responsibilities](#head1)
